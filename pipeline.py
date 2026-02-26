@@ -76,15 +76,16 @@ def encode_target(df):
     return df
 
 def encode_features(df):
-    """Convert text columns to numbers so the ML model can use them"""
+    """Convert text columns to numbers using one-hot encoding"""
     print("\nEncoding categorical features...")
-    le = LabelEncoder()
+    
+    # one-hot encode
+    # (meaning they don't have too many unique values)
     cat_cols = df.select_dtypes(include='object').columns.tolist()
-
-    for col in cat_cols:
-        df[col] = le.fit_transform(df[col].astype(str))
-
-    print(f"Encoded {len(cat_cols)} categorical columns")
+    print(f"Columns to encode: {cat_cols}")
+    
+    df = pd.get_dummies(df, columns=cat_cols, drop_first=True)
+    print(f"Shape after encoding: {df.shape}")
     return df
 
 def save_data(df, output_path):
