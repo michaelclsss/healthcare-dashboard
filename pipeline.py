@@ -64,7 +64,20 @@ def engineer_features(df):
         lambda row: sum(1 for val in row if val != 'No'), axis=1 # Add column counting how many med patient is on
     )
 
-    print(f"Added features: age (numeric), num_med_changes, total_meds")
+    df['inpatient_ratio'] = df['number_inpatient'] / (
+        df['number_outpatient'] + df['number_inpatient'] + df['number_emergency'] + 1
+    )
+
+    # Total number of visits across all types
+    df['total_visits'] = (df['number_outpatient'] + 
+                          df['number_inpatient'] + 
+                          df['number_emergency'])
+
+    # Flag for patients with high previous utilization
+    df['high_utilizer'] = (df['number_inpatient'] > 2).astype(int)
+
+    print(f"Added features: age (numeric), num_med_changes, total_meds, inpatient_ratio, total_visits, high_utilizer")
+
     return df
 
 def encode_target(df):
