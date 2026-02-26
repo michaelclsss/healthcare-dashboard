@@ -42,9 +42,11 @@ def handle_imbalance(X_train, y_train):
 def train_model(X_train, y_train):
     print("\nTraining Random Forest model...")
     model = RandomForestClassifier(
-        n_estimators=100,    # 100 decision trees
-        max_depth=10,        # limit tree depth to avoid overfitting
-        min_samples_split=10,  # need at least 10 patients to make a split
+        n_estimators=200,    # 100 decision trees
+        max_depth=15,        # limit tree depth to avoid overfitting
+        min_samples_split=20,  # need at least 10 patients to make a split
+        min_samples_leaf=10,
+        class_weight='balanced',  # give more weight to minority class
         random_state=42,     # makes results reproducible
         n_jobs=-1           # use all CPU cores to train faster
     )
