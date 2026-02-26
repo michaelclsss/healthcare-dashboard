@@ -77,6 +77,8 @@ def engineer_features(df):
     df['high_utilizer'] = (df['number_inpatient'] > 2).astype(int)
 
     print(f"Added features: age (numeric), num_med_changes, total_meds, inpatient_ratio, total_visits, high_utilizer")
+    med_cols = [c for c in med_cols if c in df.columns]
+    df = df.drop(columns=med_cols) # drops the raw medication columns after creating useful new features
 
     return df
 
@@ -89,16 +91,22 @@ def encode_target(df):
     return df
 
 def encode_features(df):
-    """Convert text columns to numbers using one-hot encoding"""
+    """One-Hot Encoding for categorical features, assign numbers to replace text."""
     print("\nEncoding categorical features...")
-    
-    # one-hot encode
-    # (meaning they don't have too many unique values)
     cat_cols = df.select_dtypes(include='object').columns.tolist()
-    print(f"Columns to encode: {cat_cols}")
-    
-    df = pd.get_dummies(df, columns=cat_cols, drop_first=True)
-    print(f"Shape after encoding: {df.shape}")
+
+    low_cardinality = [c for c in cat_cols if df[c].nunique() < 10]
+    high_cardinality = [c for c in cat_cols if df[c].nunique() >= 10]
+
+    print(f"One-hot encoding {len(low_cardinality)} columns: {low_cardinality}")
+    print(f"Dropping {len(high_cardinality)} high-cardinality columns: {high_cardinality}")
+
+    if low_cardinality:
+        df = pd.get_dummies(df, columns=low_cardinality, drop_first=True)
+    if high_cardinality:
+        df = df.drop(columns=high_cardinality) # Drop high cardinalitiy columns to avoid too many features, noise, and overfitting.
+
+    print(f"Final shape: {df.shape}")
     return df
 
 def save_data(df, output_path):
